@@ -1,12 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CMSEcommerce.infrastrectur;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CMSEcommerce.Controllers
 {
-    public class PagesController : Controller
+    public class PagesController (datacontext context) : Controller
     {
-        public IActionResult Index(string slug = "")
+        private readonly datacontext _context= context;
+        public  async Task< IActionResult> Index(string slug = "")
         {
-            return View("Index", slug);
+            slug= slug.IsNullOrEmpty()? "home" : slug;
+            Page Page = await _context.Pages.Where(x=>x.Slug==slug).FirstOrDefaultAsync();
+            if(Page == null) { return NotFound(); }
+            return View(Page);
         }
     }
 }
